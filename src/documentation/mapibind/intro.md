@@ -9,6 +9,11 @@ The [MAPIStore][whatis] bindings aim to provide a way to access the MAPIStore C 
 
 [whatis]: http://tracker.openchange.org/projects/openchange/wiki/MAPIStore_10_Development_Guide#What-is-MAPIStore/ "MAPIStore 1.0 Development Guide"
 
+- - -
+> *So far, the bindings are being implemented in Python 2.7. Type and module definition changes slightly in Python 3. In which fashion should the bindings be implemented?*
+
+- - -
+
 ## Useful background ##
 
 The following links can provide useful background to understand the MAPIStore bindings.
