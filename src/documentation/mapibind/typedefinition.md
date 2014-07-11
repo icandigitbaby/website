@@ -19,6 +19,8 @@ The *MAPIStoreObject* type has two data attributes: a *talloc* context and a *MA
 
 [apiref]: https://docs.python.org/3/c-api/index.html
 
+> *The *structs* are defined in a header file. In the existing bindings' header file `PyAPI_DATA(PyTypeObject) PyMAPIStore` appears, and I haven't found clear information about what this does. I guess that in this version it would become `PyAPI_DATA(PyTypeObject) PyMAPIStoreType`. In addition, `PyMAPIStoreType` needs a forward declaration in the .c file since is used by the `new` method. This forward declaration is required independently of the `PyAPI_DATA` declaration*
+
 - - -
 
 <br/>
@@ -47,10 +49,10 @@ The deallocation method frees/releases the two Python by calling their respectiv
 
 ## Initialisation Function ##
 
-The `initmapistore` function initialises the type and adds it to the module dictionary, allowing us to create MAPIStore instances by calling its class:
+The `initmapistore` function initialises the type and adds it to the module dictionary, allowing us to create MAPIStore instances in Python by calling its class.
 
-        >>> import mapistore
-        >>> mapi = mapistore.MAPIStore()
+        >>> from openchange import mapistore
+        >>> mapi = mapistore.MAPIStore("/syspath", <path>)
 
 - - -
 

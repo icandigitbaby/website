@@ -23,7 +23,7 @@ The following links can provide useful background to understand the MAPIStore bi
   *  The [talloc Tutorial][tutorial].
 
 [devguide]: http://tracker.openchange.org/projects/openchange/wiki/MAPIStore_10_Development_Guide
-[extending]: https://docs.python.org/3/extending/index.html
+[extending]: https://docs.python.org/2/extending/index.html
 [howtowrite]: http://starship.python.net/crew/arcege/extwriting/pyext.html
 [tutorial]: https://talloc.samba.org/talloc/doc/html/libtalloc__tutorial.html
 
