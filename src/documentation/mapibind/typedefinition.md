@@ -3,64 +3,65 @@
 # Type Definition #
 
 <br/>
-## Data attributes ##
-
-The *MAPIStoreObject* type has two data attributes: a *talloc* context and a *MAPIStore* context, where the latter will hang off the former.
-
-        typedef struct {
-          PyObject_HEAD
-          TALLOC_CTX                    *mem_ctx;
-          struct mapistore_context      *mstore_ctx;
-        } MAPIStoreObject;
-
-- - -
-
-> *Regarding the names: The [Python/C API Reference Manual][apiref] strongly discourages the use of the *Py* and *_Py* prefixes. It is necessary to discuss the names so they are both clear and consistent.*
-
-[apiref]: https://docs.python.org/3/c-api/index.html
-
-> *The *structs* are defined in a header file. In the existing bindings' header file `PyAPI_DATA(PyTypeObject) PyMAPIStore` appears, and I haven't found clear information about what this does. I guess that in this version it would become `PyAPI_DATA(PyTypeObject) PyMAPIStoreType`. In addition, `PyMAPIStoreType` needs a forward declaration in the .c file since is used by the `new` method. This forward declaration is required independently of the `PyAPI_DATA` declaration*
-
-- - -
-
-<br/>
-## `New` Method ##
-
-This method is responsible of creating objects of the type with default initial values. 
-
-        static PyObject *MAPIStore_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
-
-It basically creates a `self` wrapper and initialises its *talloc* and *MAPIStore* contexts by calling their respective initialisation functions. The wrapper is then returned as a `PyObject` pointer. Two arguments can be found at `*args`: `syspath` and the optional argument `path`.
-The `mapistore_init` function takes a *talloc* context, a *Samba* *LoadParm* context and a path as arguments. The `syspath` argument is used to initialise the samba LDB, wich will allow the default *LoadParm* parameters to be loaded. If the `path` argument is not provided, a `NULL` pointer can be passed to the `mapistore_init` function.
-
-- - -
-
-> - *Why is `PyObject_New` used as opposed to `(MAPIStoreObject *)type->tp_alloc(type, 0)`? The second appears in the Python reference guide. Same with `PyObject_Del` vs `Py_TYPE(self)->tp_free((PyObject*)self)`.*
-- *I'm quite a bit lost with the samba initialisation functions, just copied it hoping they wouldn't cause conflicts. Which is not a good practice.*
-
-- - -
-
-<br/>
-## Destructor ##
-
-The deallocation method frees/releases the two Python by calling their respective destructors. Then, it calls `PyObject_Del` to free the object's memory.
-
-        static void MAPIStore_dealloc(PyObject *_self)
 
 ## Initialisation Function ##
 
 The `initmapistore` function initialises the type and adds it to the module dictionary, allowing us to create MAPIStore instances in Python by calling its class.
 
         >>> from openchange import mapistore
-        >>> mapi = mapistore.MAPIStore("/syspath", <path>)
+        >>> mapi = mapistore.MAPIStore([<syspath>])
 
-- - -
-
-> *Review the object creation once the bindings are built*
-
-- - -
 <br/>
 
-# Next: Next Chapter #
+## Data attributes ##
 
-Proceed to the [Next Chapter](next.html)
+The *MAPIStoreObject* type has four data attributes: a *talloc* context and two contexts hanging off it: a *loadparm* context and a *MAPIStore* context. It has an additional attribute that definies de debug level of the methods, and which can be set directly from python.
+
+        typedef struct {
+          PyObject_HEAD
+          TALLOC_CTX                    *mem_ctx;
+          loadparm_context              *lp_ctx;
+          struct mapistore_context      *mstore_ctx;
+          int                           debuglevel;
+        } PyMAPIStoreObject;
+
+There are also three global variables. `datetime_module` and `datetime_datetime_class` are set during the initialisation of the type, while `ocdb_context` is set during the initialisation of the *Openchange* LDB.
+
+        typedef struct {
+        PyObject                        *datetime_module;
+        PyObject                        *datetime_datetime_class;
+        struct openchangedb_context     *ocdb_ctx;
+        } PyMAPIStoreGlobals;
+
+- - -
+
+> *Explain the two first global variables a bit more*
+
+> *The *structs* are defined in a header file. In the existing bindings' header file `PyAPI_DATA(PyTypeObject) PyMAPIStore` appears, and I haven't found clear information about what this does.
+
+- - -
+
+
+
+<br/>
+
+## `New` Method ##
+
+This method is responsible of creating objects of the type with the default initial parameters. 
+
+        static PyObject *py_MAPIStore_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
+
+When a new PyMAPIStore object is created in Python, this method is executed. It basically returns an object with an initialised *talloc* context, a *loadparm* context initialised to the default values and an empty *MAPIStore* context. It takes an optional argument, `syspath`, that specifies the route to the `sam.conf` file.
+
+<br/>
+
+## Destructor ##
+
+The deallocation method frees/releases the attributes in the type by calling their respective destructors. Then, it calls `PyObject_Del` to free the object's memory.
+
+        static void MAPIStore_dealloc(PyObject *_self)
+<br/>
+
+# Next: Initialisation #
+
+Proceed to [Initialisation](initialisation.html)
